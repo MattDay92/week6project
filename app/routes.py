@@ -2,7 +2,7 @@ from app import app
 from flask import render_template, request, redirect, url_for, flash
 from .forms import UserCreationForm, loginform, ItemSubmitForm
 from .models import User, Item, Cart
-from flask_login import login_user, logout_user, current_user
+from flask_login import login_user, logout_user, current_user, login_required
 
 
 @app.route('/signup', methods=["GET", "POST"])
@@ -55,6 +55,7 @@ def loginPage():
 
 
 @app.route('/logout', methods=['GET'])
+@login_required
 def logout():
     logout_user()
     flash("Successfully logged out!", category="success")
@@ -69,6 +70,7 @@ def shopPage():
     return render_template('shop.html', items=items)
 
 @app.route('/addtocart/<int:item_id>', methods=["GET", "POST"])
+@login_required
 def addToCart(item_id):
     
     transaction = Cart(item_id, current_user.id)
@@ -78,6 +80,7 @@ def addToCart(item_id):
     return redirect(url_for('shopPage'))
 
 @app.route('/mycart', methods=["GET", "POST"])
+@login_required
 def myCart():
 
     my_cart = Cart.query.filter_by(customer_id = current_user.id).all()
@@ -91,6 +94,7 @@ def myCart():
     return render_template('cart.html', my_cart=my_cart, total=total)
 
 @app.route('/cart/<int:item_id>/delete', methods=["GET", "POST"])
+@login_required
 def deleteItem(item_id):
     item = Cart.query.get(item_id)
 
@@ -99,6 +103,7 @@ def deleteItem(item_id):
     return redirect(url_for('myCart'))
 
 @app.route('/cart/deleteall', methods=["GET", "POST"])
+@login_required
 def deleteAll():
 
     cart = Cart.query.all()
@@ -108,6 +113,7 @@ def deleteAll():
     return redirect(url_for('shopPage'))
 
 @app.route('/shop/<int:item_id>')
+@login_required
 def singleItem(item_id):
 
     item = Item.query.get(item_id)
@@ -115,6 +121,7 @@ def singleItem(item_id):
     return render_template('singleitem.html', item=item)
 
 @app.route('/admin', methods=['GET', 'POST'])
+@login_required
 def adminPage():
     form = ItemSubmitForm()
     print(request.method)
