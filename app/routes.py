@@ -98,6 +98,15 @@ def deleteItem(item_id):
 
     return redirect(url_for('myCart'))
 
+@app.route('/cart/deleteall', methods=["GET", "POST"])
+def deleteAll():
+
+    cart = Cart.query.all()
+    for item in cart:
+        item.deleteFromDB()
+
+    return redirect(url_for('shopPage'))
+
 @app.route('/shop/<int:item_id>')
 def singleItem(item_id):
 
