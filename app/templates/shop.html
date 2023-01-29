@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1 class="text-center my-3">Welcome to the Bike Shop!</h1>
+<h4 class="text-center my-3">Pedal Towards Savings Today!</h4>
+
+<div class="container col-10 my-5">
+<div class="row">
+    {% for item in items %}
+    <div class="card col-3">
+        <img class="card-img-top p-1" src="{{item.img_url}}" alt="item.name">
+        <div class="card-body">
+            <h5 class="card-title my-4">{{item.name}}</h5>
+            <a class="btn btn-primary" href="{{url_for('singleItem', item_id = item.id)}}">More Info</a>
+            <h4 class="card-subtitle my-4">${{item.price}}</h4>
+            <a href="{{url_for('addToCart', item_id = item.id)}}" class="btn btn-success">Add to Cart</a>
+            
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+
+    {% endblock %}

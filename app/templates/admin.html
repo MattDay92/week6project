@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+    <h1 class="text-center">Add Item</h1>
+
+    <form method="POST" class="container col-4">
+        {{ form.hidden_tag() }}
+
+        {{ form.name(class='form-control', placeholder='Name of Product') }}
+        {{ form.img_url(class='form-control', placeholder='Image URL') }}
+        {{ form.details(class='form-control', placeholder='Description of Product') }}
+        {{ form.price(class='form-control', placeholder='Price')}}
+
+        {{ form.submit(class='btn btn-primary') }}
+    </form>
+   
+
+
+{% endblock %}
