@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from flask_login import UserMixin
+from secrets import token_hex
 
 db = SQLAlchemy()
 
@@ -9,6 +10,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(45), nullable=False, unique=True)
     email = db.Column(db.String(150), nullable=False, unique=True)
     password = db.Column(db.String, nullable=False)
+    apitoken = db.Column(db.String)
     cart = db.relationship('Cart', backref='author', lazy=True)
     
 
@@ -20,6 +22,14 @@ class User(db.Model, UserMixin):
     def saveToDB(self):
         db.session.add(self)
         db.session.commit()
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'username': self.username,
+            'password': self.password,
+            'apitoken': token_hex(16)
+        }
 
 class Item(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -68,3 +78,10 @@ class Cart(db.Model):
     def deleteFromDB(self):
         db.session.delete(self)
         db.session.commit()
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'item_id': self.item_id,
+            'customer_id': self.customer_id
+        }
