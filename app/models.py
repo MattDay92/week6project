@@ -41,6 +41,16 @@ class Item(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'imgUrl': self.img_url,
+            'details': self.details,
+            'price': self.price,
+            'dateCreated': self.date_created
+        }
+
 class Cart(db.Model):
     __tablename__ = 'cart'
     id = db.Column(db.Integer, primary_key=True)
