@@ -37,11 +37,13 @@ def singleItem(item_id):
 basic_auth = HTTPBasicAuth()
 token_auth = HTTPTokenAuth()
 
+
+
 @basic_auth.verify_password
 def verifyPassword(username, password):
     user = User.query.filter_by(username=username).first()
     if user:
-        if check_password_hash(user.password, password):
+        if user.password == password:
             return user
 
 @token_auth.verify_token
@@ -76,11 +78,16 @@ def signUpAPI():
 # Login Function
 def getToken():
     user = basic_auth.current_user()
-    print(user)
-    return {
-        'status': 'ok',
-        'user': user.to_dict()
-    }
+    if user:
+        print(user)
+        return {
+            'status': 'ok',
+            'user': user.to_dict()
+        }
+    else:
+        return {
+            'status': 'not ok'
+        }
 
 @api.route('/api/addtocart/<int:item_id>', methods=["GET", "POST"])
 @login_required
