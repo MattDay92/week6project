@@ -23,12 +23,16 @@ def shopPageAPI():
         'items': [i.to_dict() for i in items]
     }
 
-@api.route('/api/shop/<int:item_id>', methods=["GET"])
+@api.route('/api/shop/<int:item_id>/', methods=["GET"])
 def singleItem(item_id):
 
-    item = Item.query.get(item_id)
+    single = Item.query.get(item_id)
+    print(single)
 
-    return item.to_dict()
+    return {
+        'status': 'ok',
+        'item': single.to_dict()
+    }
 
 
 
