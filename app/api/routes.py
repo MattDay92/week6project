@@ -49,6 +49,7 @@ def verifyPassword(username, password):
 @token_auth.verify_token
 def verifyToken(token):
     user = User.query.filter_by(apitoken=token).first()
+    print(user, 'verify')
     if user:
         return user
 
@@ -89,27 +90,36 @@ def getToken():
             'status': 'not ok'
         }
 
-@api.route('/api/addtocart/<int:item_id>', methods=["GET", "POST"])
-@login_required
-def addToCart(item_id):
+@api.route('/api/cart/add', methods=["POST"])
+@token_auth.login_required
+def addToCart():
+    data = request.json
     
-    transaction = Cart(item_id, current_user.id)
+    item_id = data['itemId']
+    item = Item.query.get(item_id)
+    user = token_auth.current_user()
+    
+    transaction = Cart(item_id, user.id)
     transaction.saveToDB()
 
     return {
         'status': 'ok',
-        'message': 'Item successfully added to cart.'
+        'message': f'Item successfully added {item.name} to cart.',
+        
     } 
 
-@api.route('/api/mycart', methods=["GET", "POST"])
-@login_required
+@api.route('/api/mycart', methods=["GET"])
+@token_auth.login_required
 def myCart():
 
-    my_cart = Cart.query.filter_by(customer_id = current_user.id).all()
+    user = token_auth.current_user()
+    print(user)
+    my_cart = [Item.query.get(c.item_id).to_dict() for c in user.cart]
 
     total = 0
     for item in my_cart:
-        total += float(item.info.price)
+        total += 1
+
 
     return {
         'status': 'ok',
@@ -117,10 +127,15 @@ def myCart():
         'total': total
     }
 
-@api.route('/api/cart/<int:item_id>/delete', methods=["GET", "POST"])
-@login_required
-def deleteItem(item_id):
-    item = Cart.query.get(item_id)
+@api.route('/api/cart/delete', methods=["POST"])
+@token_auth.login_required()
+def deleteItemAPI():
+
+    user = token_auth.current_user()
+    data = request.json
+    print(data['itemId'])
+    item = Cart.query.filter_by(customer_id = user.id).filter_by(item_id = data['itemId']).first()
+    print(item)
 
     item.deleteFromDB()
 
@@ -129,15 +144,17 @@ def deleteItem(item_id):
         'message': 'Item successfully deleted from cart'
     }
 
-@api.route('/api/cart/deleteall', methods=["GET", "POST"])
-@login_required
-def deleteAll():
+@api.route('/api/cart/deleteall', methods=["POST"])
+@token_auth.login_required
+def deleteAllAPI():
 
-    cart = Cart.query.all()
-    for item in cart:
+    user = token_auth.current_user()
+    items = Cart.query.filter_by(customer_id = user.id).all()
+    print(items)
+    for item in items:
         item.deleteFromDB()
 
     return {
         'status': 'ok',
-        'message': 'Successfully deleted all items from cart.'
+        'message': 'Successfully deleted everything from your cart'
     }

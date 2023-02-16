@@ -18,6 +18,7 @@ class User(db.Model, UserMixin):
         self.username = username
         self.email = email
         self.password = password
+        self.apitoken = token_hex(16)
 
     def saveToDB(self):
         db.session.add(self)
@@ -28,7 +29,7 @@ class User(db.Model, UserMixin):
             'id': self.id,
             'username': self.username,
             'password': self.password,
-            'apitoken': token_hex(16)
+            'apitoken': self.apitoken
         }
 
 class Item(db.Model):
